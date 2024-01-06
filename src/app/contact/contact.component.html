@@ -1,5 +1,13 @@
 <lib-dynamic-layout title="Contact" backURL="/home">
+    <ng-container selectaction>
+        selectaction
+    </ng-container>
+
+    <ng-container gridaction>
+        <mat-icon>add</mat-icon>
+    </ng-container>
+
     <ng-container pagebody>
-        <lib-table-view></lib-table-view>
+        <lib-table-view [rowData]="rowData" [columnDefs]="columnDefs"></lib-table-view>
     </ng-container>
 </lib-dynamic-layout>
