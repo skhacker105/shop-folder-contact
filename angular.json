@@ -74,8 +74,8 @@
 					},
 					"defaultConfiguration": "development",
 					"options": {
-						"port": 4500,
-						"publicHost": "http://localhost:4500",
+						"port": 4600,
+						"publicHost": "http://localhost:4600",
 						"extraWebpackConfig": "webpack.config.js"
 					}
 				},

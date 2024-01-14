@@ -10,7 +10,12 @@ set selectedLibrary=_
 
 IF NOT "%1"=="" (set selectedLibrary=%1)
 IF /i %selectedLibrary%==_ goto finalExit
+CALL COLOR A
+echo:
+echo ------------------------------------------------------------------------------
 echo Updating %selectedLibrary% in Contact
+echo ------------------------------------------------------------------------------
+CALL COLOR F
 
 cd %sfContact%
 CALL npm i %selectedLibrary%@latest

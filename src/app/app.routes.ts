@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ContactComponent } from './contact/contact.component';
+import { ContactComponent } from './components/contact/contact.component';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 
 export const routes: Routes = [
