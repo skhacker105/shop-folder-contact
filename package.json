@@ -26,9 +26,8 @@
     "ag-grid-community": "^31.0.1",
     "rxjs": "~7.8.0",
     "shop-folder-component": "^0.0.207",
-    "shop-folder-core": "^0.0.7",
-    "shop-folder-logo": "^0.0.51",
-    "shop-folder-store": "^0.0.6",
+    "shop-folder-core": "^0.0.8",
+    "shop-folder-logo": "^0.0.52",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"
   },
