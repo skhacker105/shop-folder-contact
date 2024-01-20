@@ -24,6 +24,7 @@
     "@angular/router": "^17.0.0",
     "ag-grid-angular": "^31.0.1",
     "ag-grid-community": "^31.0.1",
+    "dexie": "^3.2.4",
     "rxjs": "~7.8.0",
     "shop-folder-component": "^0.0.207",
     "shop-folder-core": "^0.0.8",
