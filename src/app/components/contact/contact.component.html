@@ -12,13 +12,43 @@
 
     <ng-container pagebody>
         @if (selectedView) {
-        <ag-grid-angular class="table-view ag-theme-balham" [rowData]="data" [columnDefs]="selectedView.columnDefs"
-            [defaultColDef]="defaultColDef" [groupDefaultExpanded]="1"
-            [autoGroupColumnDef]="selectedView.autoGroupColumnDef">
+        <ag-grid-angular class="table-view ag-theme-balham" [gridOptions]="grid" [rowData]="data"
+            [columnDefs]="selectedView.columnDefs" [defaultColDef]="defaultColDef" [groupDefaultExpanded]="1"
+            [groupSelectsChildren]="true" rowSelection="multiple" [autoGroupColumnDef]="selectedView.autoGroupColumnDef"
+             (gridReady)="onGridReady($event)">
         </ag-grid-angular>
         }
         @else {
         No view selected
         }
+    </ng-container>
+
+    <ng-container pagefooter>
+        <div class="footer">
+
+            <div class="views-menu">
+                <mat-icon [matMenuTriggerFor]="viewMenu">more_vert</mat-icon>
+                <mat-menu #viewMenu="matMenu">
+                    @for (view of gridViews; track view.viewName) {
+                        <button mat-menu-item (click)="updateSelectedView(view)">
+                            <span>{{view.viewName}}</span>
+                        </button>
+                    }
+                </mat-menu>
+            </div>
+
+            <div class="view-current" [matMenuTriggerFor]="viewMenu">
+                {{ selectedView?.viewName }}
+            </div>
+
+            <div class="spacer"></div>
+
+            @if (allExpanded) {
+            <mat-icon (click)="collapseAll()">toggle_off</mat-icon>
+            }
+            @else {
+            <mat-icon (click)="expandAll()">toggle_on</mat-icon>
+            }
+        </div>
     </ng-container>
 </lib-dynamic-layout>

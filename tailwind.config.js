@@ -8,6 +8,7 @@ module.exports = {
       fontSize: {
         "default": '11px',
         "page-header": '11px',
+        "page-footer": '11px',
 
         "dashboard-box": '9px',
         "dashboard-title": '9px',
