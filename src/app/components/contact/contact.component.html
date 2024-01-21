@@ -1,13 +1,24 @@
-<lib-dynamic-layout title="Contact" backURL="/home">
+<lib-dynamic-layout title="Contact" backURL="/home" (selectModeChange)="handleSelectModeChange($event)">
     <ng-container selectaction>
-        selectaction
+        @if (enableSelectedAction){
+        <mat-icon>delete</mat-icon>
+        }
     </ng-container>
 
     <ng-container gridaction>
         <mat-icon>add</mat-icon>
+        <mat-icon>sync</mat-icon>
     </ng-container>
 
     <ng-container pagebody>
-        <lib-table-view [rowData]="rowData" [columnDefs]="columnDefs"></lib-table-view>
+        @if (selectedView) {
+        <ag-grid-angular class="table-view ag-theme-balham" [rowData]="data" [columnDefs]="selectedView.columnDefs"
+            [defaultColDef]="defaultColDef" [groupDefaultExpanded]="1"
+            [autoGroupColumnDef]="selectedView.autoGroupColumnDef">
+        </ag-grid-angular>
+        }
+        @else {
+        No view selected
+        }
     </ng-container>
 </lib-dynamic-layout>
