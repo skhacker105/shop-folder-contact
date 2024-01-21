@@ -1,4 +1,4 @@
-<lib-dynamic-layout title="Contact" backURL="/home" (selectModeChange)="handleSelectModeChange($event)">
+<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true" (selectModeChange)="handleSelectModeChange($event)">
     <ng-container selectaction>
         @if (enableSelectedAction){
         <mat-icon>delete</mat-icon>

@@ -41,26 +41,71 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
   }
 
   loadDummyData() {
-    this.data = [
-      this.createContact('+91 8886161092', 'Saurabh Kumar'),
-      this.createContact('+91 1234567890', 'Diksha Bharti'),
-      this.createContact('+91 4567891230', 'John Doe'),
-      this.createContact('+91 1231230456', 'Shikhar'),
-      this.createContact('+91 7894560789', 'Mahendra Singh Dhoni'),
-      this.createContact('+91 6546549870', 'John Okawa'),
-      this.createContact('+91 8886161092', 'John Okawa'),
-      this.createContact('+91 1234567890', 'John Okawa'),
-      this.createContact('+91 4567891230', 'John Okawa'),
-      this.createContact('+91 1231230456', 'John Okawa'),
-      this.createContact('+91 7894560789', 'John Okawa'),
-      this.createContact('+91 6546549870', 'John Okawa'),
-      this.createContact('+91 8886161092', 'John Okawa'),
-      this.createContact('+91 1234567890', 'John Okawa'),
-      this.createContact('+91 4567891230', 'John Okawa'),
-      this.createContact('+91 1231230456', 'John Okawa'),
-      this.createContact('+91 7894560789', 'John Okawa'),
-      this.createContact('+91 6546549870', 'John Okawa'),
-    ].sort((a, b) => a.name.localeCompare(b.name));
+    this.data = [];
+    const realNames = [
+      "Saurabh Kumar",
+      "Diksha Bharti",
+      "John Doe",
+      "Shikhar",
+      "Mahendra Singh Dhoni",
+      "Alice Johnson",
+      "Bob Smith",
+      "Catherine Brown",
+      "David Miller",
+      "Shikhar",
+      "Mahendra Singh Dhoni",
+      "Alice Johnson",
+      "Bob Smith",
+      "Catherine Brown",
+      "David Miller",
+      "Shikhar",
+      "Mahendra Singh Dhoni",
+      "Alice Johnson",
+      "Bob Smith",
+      "Catherine Brown",
+      "David Miller",
+      "Emily Davis",
+      "Frank Wilson",
+      "Grace Martinez",
+      "Henry Taylor",
+      "Isabel Anderson",
+      "Jack White",
+      "Katherine Harris",
+      "Liam Martin",
+      "Mia Thompson",
+      "Nathan Jackson",
+      "Olivia Garcia",
+      "Peter Robinson",
+      "Quinn Lee",
+      "Rachel Turner",
+      "Samuel Harris",
+      "Liam Martin",
+      "Mia Thompson",
+      "Nathan Jackson",
+      "Olivia Garcia",
+      "Peter Robinson",
+      "Quinn Lee",
+      "Rachel Turner",
+      "Samuel Harris",
+      "Sophia Martinez",
+      "Thomas Clark",
+      "Uma Patel",
+      "Victor Adams",
+      "Wendy Parker",
+      "Xander Turner",
+      "Yvonne Mitchell",
+      "Zachary Wright",
+      "Alice Johnson",
+      "Bob Smith",
+      "Catherine Brown",
+      "David Miller",
+    ];
+    for (let i = 0; i < 56; i++) {
+      let phone = `+91 ${Math.floor(Math.random() * 10000000000).toString().padStart(10, '0')}`;
+      let name = realNames[Math.floor(Math.random() * realNames.length)];;
+      this.data.push(this.createContact(phone, name));
+    }
+    this.data.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   createContact(mainPhoneNumber: string, name: string, isMe = false) {
