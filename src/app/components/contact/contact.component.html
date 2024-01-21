@@ -1,6 +1,7 @@
-<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true" (selectModeChange)="handleSelectModeChange($event)">
+<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true"
+    (selectModeChange)="handleSelectModeChange($event)">
     <ng-container selectaction>
-        @if (enableSelectedAction){
+        @if (gridApi && gridApi.getSelectedRows().length > 0){
         <mat-icon>delete</mat-icon>
         }
     </ng-container>
@@ -15,7 +16,7 @@
         <ag-grid-angular class="table-view ag-theme-balham" [gridOptions]="grid" [rowData]="data"
             [columnDefs]="selectedView.columnDefs" [defaultColDef]="defaultColDef" [groupDefaultExpanded]="1"
             [groupSelectsChildren]="true" rowSelection="multiple" [autoGroupColumnDef]="selectedView.autoGroupColumnDef"
-             (gridReady)="onGridReady($event)">
+            (gridReady)="onGridReady($event)" (selectionChanged)="onSelectionChanged()">
         </ag-grid-angular>
         }
         @else {
@@ -30,11 +31,11 @@
                 <mat-icon [matMenuTriggerFor]="viewMenu">more_vert</mat-icon>
                 <mat-menu #viewMenu="matMenu">
                     @for (view of gridViews; track view.viewName) {
-                        <button mat-menu-item (click)="updateSelectedView(view)" [ngClass]="{
+                    <button mat-menu-item (click)="updateSelectedView(view)" [ngClass]="{
                             'selected-view': selectedView?.viewName === view.viewName
                         }">
-                            <span>{{view.viewName}}</span>
-                        </button>
+                        <span>{{view.viewName}}</span>
+                    </button>
                     }
                 </mat-menu>
             </div>
