@@ -2,7 +2,7 @@ import { IGridView } from "shop-folder-core";
 
 export const GROUP_BY_NAME_COLUMNS: IGridView = {
     viewName: 'Group By Name',
-    isDefault: true,
+    isDefault: false,
     columnDefs: [
         {
             headerName: 'Contact',

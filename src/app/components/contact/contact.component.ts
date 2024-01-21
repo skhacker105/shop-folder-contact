@@ -30,8 +30,6 @@ const ContactPageViews: IGridView[] = [
 })
 export class ContactComponent extends GridService<IContact> implements OnInit {
 
-  prevGroupColWidth: number | undefined;
-
   constructor(public route: ActivatedRoute) {
     super(ContactPageViews, route);
   }
@@ -124,22 +122,32 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
   handleSelectModeOn() {
     if (this.selectedView?.autoGroupColumnDef) {
       this.selectedView.autoGroupColumnDef.checkboxSelection = true;
-      this.prevGroupColWidth = this.selectedView.autoGroupColumnDef.width;
-      this.selectedView.autoGroupColumnDef.width = (this.prevGroupColWidth ? this.prevGroupColWidth : 0) + 35;
       this.gridApi.updateGridOptions({
         autoGroupColumnDef: this.selectedView.autoGroupColumnDef
       });
+    } else {
+      if (this.selectedView)
+      this.selectedView.columnDefs[0].checkboxSelection = true;
+      this.gridApi.updateGridOptions({
+        columnDefs: this.selectedView?.columnDefs
+      });
     }
+    this.gridApi.autoSizeAllColumns();
   }
 
   handleSelectModeOff() {
     if (this.selectedView?.autoGroupColumnDef) {
       this.selectedView.autoGroupColumnDef.checkboxSelection = false;
-      this.selectedView.autoGroupColumnDef.width = this.prevGroupColWidth;
-      this.prevGroupColWidth = undefined;
       this.gridApi.updateGridOptions({
         autoGroupColumnDef: this.selectedView.autoGroupColumnDef
       });
+    } else {
+      if (this.selectedView)
+      this.selectedView.columnDefs[0].checkboxSelection = false;
+      this.gridApi.updateGridOptions({
+        columnDefs: this.selectedView?.columnDefs
+      });
     }
+    this.gridApi.autoSizeAllColumns();
   }
 }

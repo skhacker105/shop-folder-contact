@@ -1,8 +1,8 @@
 import { IGridView } from "shop-folder-core";
 
 export const DEFAULT_COLUMNS: IGridView = {
-    viewName: 'DEFAULT',
-    isDefault: true,
+    viewName: 'FLAT',
+    isDefault: false,
     columnDefs: [
         {
             headerName: 'Contact',

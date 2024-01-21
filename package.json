@@ -28,8 +28,8 @@
     "ag-grid-community": "^31.0.2",
     "ag-grid-enterprise": "^31.0.2",
     "rxjs": "~7.8.0",
-    "shop-folder-component": "^0.0.216",
-    "shop-folder-core": "^0.0.27",
+    "shop-folder-component": "^0.0.218",
+    "shop-folder-core": "^0.0.29",
     "shop-folder-logo": "^0.0.53",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"

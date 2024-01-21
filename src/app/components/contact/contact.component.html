@@ -30,7 +30,9 @@
                 <mat-icon [matMenuTriggerFor]="viewMenu">more_vert</mat-icon>
                 <mat-menu #viewMenu="matMenu">
                     @for (view of gridViews; track view.viewName) {
-                        <button mat-menu-item (click)="updateSelectedView(view)">
+                        <button mat-menu-item (click)="updateSelectedView(view)" [ngClass]="{
+                            'selected-view': selectedView?.viewName === view.viewName
+                        }">
                             <span>{{view.viewName}}</span>
                         </button>
                     }

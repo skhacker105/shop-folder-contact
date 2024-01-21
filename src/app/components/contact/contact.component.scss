@@ -1,4 +1,3 @@
-
 .default-col-width {
     width: 100% !important;
 }
@@ -9,7 +8,10 @@
     max-height: 100%;
 
     ::ng-deep {
-        .ag-header-container, .ag-header-row, .ag-center-cols-container  {
+
+        .ag-header-container,
+        .ag-header-row,
+        .ag-center-cols-container {
             width: 100% !important;
         }
 
@@ -38,6 +40,7 @@
 
     .views-menu {
         font-size: inherit;
+
         .mat-icon {
             line-height: 37px;
             width: 16px;
@@ -45,4 +48,8 @@
             font-size: 25px;
         }
     }
+}
+
+.selected-view {
+    background-color: #f5f7f7;
 }
