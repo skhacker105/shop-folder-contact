@@ -10,15 +10,17 @@ export class Contact implements IContact {
     createdBy: number;
     createdOn: Date;
     isSelected: boolean;
+    types: string[];
 
-    constructor(userContactNumber: string, userContactId: number, obj?: any) {
-        this.name = obj && obj.name ? obj.name : '';
-        this.mainPhoneNumber = obj && obj.mainPhoneNumber ? obj.mainPhoneNumber : '';
-        this.otherPhoneNumbers = obj && obj.otherPhoneNumbers ? obj.otherPhoneNumbers : [];
-        this.openingBalance = obj && obj.openingBalance ? obj.openingBalance : 0;
+    constructor(userContactNumber: string, userContactId: number, contactObj?: any) {
+        this.name = contactObj && contactObj.name ? contactObj.name : '';
+        this.mainPhoneNumber = contactObj && contactObj.mainPhoneNumber ? contactObj.mainPhoneNumber : '';
+        this.otherPhoneNumbers = contactObj && contactObj.otherPhoneNumbers ? contactObj.otherPhoneNumbers : [];
+        this.openingBalance = contactObj && contactObj.openingBalance ? contactObj.openingBalance : 0;
+        this.types = contactObj && contactObj.types ? contactObj.types : [];
         this.isMe = this.checkIfItIsMe(userContactNumber);
-        this.createdBy = obj && obj.createdBy ? obj.createdBy : userContactId;
-        this.createdOn = obj && obj.createdOn ? obj.createdOn : new Date();
+        this.createdBy = contactObj && contactObj.createdBy ? contactObj.createdBy : userContactId;
+        this.createdOn = contactObj && contactObj.createdOn ? contactObj.createdOn : new Date();
         this.isSelected = false;
     }
 

@@ -1,24 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { DynamicLayoutComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { GridService, IContact, IGridView } from 'shop-folder-core';
+import { GridService, IGridView } from 'shop-folder-core';
 import { ActivatedRoute } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 
 // AG Grid
-import { GridApi, GridOptions } from 'ag-grid-community';
 import { AgGridModule } from 'ag-grid-angular';
 import 'ag-grid-enterprise';
 
 // Views
-import { DEFAULT_COLUMNS, GROUP_BY_LETTER_COLUMNS, GROUP_BY_NAME_COLUMNS } from '../../view-columns';
+import { DEFAULT_COLUMNS, GROUP_BY_LETTER_COLUMNS, GROUP_BY_NAME_COLUMNS, GROUP_BY_TYPE_COLUMNS } from '../../view-columns';
 
 const ContactPageViews: IGridView[] = [
   DEFAULT_COLUMNS,
   GROUP_BY_LETTER_COLUMNS,
-  GROUP_BY_NAME_COLUMNS
+  GROUP_BY_NAME_COLUMNS,
+  GROUP_BY_TYPE_COLUMNS
 ];
 
 @Component({
@@ -28,7 +28,7 @@ const ContactPageViews: IGridView[] = [
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss'
 })
-export class ContactComponent extends GridService<IContact> implements OnInit {
+export class ContactComponent extends GridService<Contact> implements OnInit {
 
   constructor(public route: ActivatedRoute) {
     super(ContactPageViews, route);
@@ -36,6 +36,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
 
   ngOnInit(): void {
     this.loadDummyData();
+    this.grid.suppressHorizontalScroll = true;
   }
 
   loadDummyData() {
@@ -98,15 +99,22 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       "Catherine Brown",
       "David Miller",
     ];
+    const types = [
+      'Supplier', 'Customer', 'Employee', 'Family',
+      'Supplier', 'Customer', 'Employee', 'Family'
+    ]
     for (let i = 0; i < 56; i++) {
       let phone = `+91 ${Math.floor(Math.random() * 10000000000).toString().padStart(10, '0')}`;
-      let name = realNames[Math.floor(Math.random() * realNames.length)];;
-      this.data.push(this.createContact(phone, name));
+      let name = realNames[Math.floor(Math.random() * realNames.length)];
+      const isMe = i % 25 === 0;
+      const start = Math.floor((Math.random() * 8));
+      const end =  Math.floor((Math.random() * 8));
+      this.data.push(this.createContact(phone, name, types.slice(start, end), isMe));
     }
     this.data.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  createContact(mainPhoneNumber: string, name: string, isMe = false) {
+  createContact(mainPhoneNumber: string, name: string, types: string[] = [], isMe = false) {
     return new Contact('', 0, {
       createdBy: 0,
       createdOn: new Date(),
@@ -115,7 +123,8 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       mainPhoneNumber,
       name,
       openingBalance: 0,
-      otherPhoneNumbers: []
+      otherPhoneNumbers: [],
+      types
     })
   }
 
@@ -127,7 +136,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       });
     } else {
       if (this.selectedView)
-      this.selectedView.columnDefs[0].checkboxSelection = true;
+        this.selectedView.columnDefs[0].checkboxSelection = true;
       this.gridApi.updateGridOptions({
         columnDefs: this.selectedView?.columnDefs
       });
@@ -143,7 +152,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       });
     } else {
       if (this.selectedView)
-      this.selectedView.columnDefs[0].checkboxSelection = false;
+        this.selectedView.columnDefs[0].checkboxSelection = false;
       this.gridApi.updateGridOptions({
         columnDefs: this.selectedView?.columnDefs
       });

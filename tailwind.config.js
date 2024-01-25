@@ -16,16 +16,22 @@ module.exports = {
       backgroundColor: {
         "default": 'white',
         "page-content": 'transparent',
+        "selected": {
+          "row": "#f5f7f7 !important"
+        },
         "dashboard": {
           "logo": 'transparent',
           "box": '#afb1c3c2',
           "title": '#020268',
           "title-logo": 'transparent',
-        },
+        }
       },
       textColor: {
         "page-header": '#ffffff',
         "page-footer": '#ffffff',
+        "selected": {
+          "row": "blue !important"
+        },
         "dashboard": {
           "box": '#000000',
           "title": '#ffffff'
@@ -54,7 +60,7 @@ module.exports = {
   },
   plugins: [],
   safelist: [{
-    pattern: /(bg|background|text|leading|fill|stroke|border-b)-(default|page|dashboard|url)/
+    pattern: /(bg|background|text|leading|fill|stroke|border-b)-(selected|default|page|dashboard|url)/
   }]
 }
 

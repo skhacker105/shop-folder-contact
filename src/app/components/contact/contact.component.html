@@ -1,4 +1,4 @@
-<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true"
+<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true" [hideFilter]="false"
     (selectModeChange)="handleSelectModeChange($event)">
     <ng-container selectaction>
         @if (gridApi && gridApi.getSelectedRows().length > 0){
@@ -25,33 +25,31 @@
     </ng-container>
 
     <ng-container pagefooter>
-        <div class="footer">
 
-            <div class="views-menu">
-                <mat-icon [matMenuTriggerFor]="viewMenu">more_vert</mat-icon>
-                <mat-menu #viewMenu="matMenu">
-                    @for (view of gridViews; track view.viewName) {
-                    <button mat-menu-item (click)="updateSelectedView(view)" [ngClass]="{
-                            'selected-view': selectedView?.viewName === view.viewName
+        <!-- View -->
+        <div class="views-menu">
+            <mat-icon [matMenuTriggerFor]="viewMenu">more_vert</mat-icon>
+            <mat-menu #viewMenu="matMenu">
+                @for (view of gridViews; track view.viewName) {
+                <button mat-menu-item (click)="updateSelectedView(view)" [ngClass]="{
+                            'bg-selected-row text-selected-row': selectedView?.viewName === view.viewName
                         }">
-                        <span>{{view.viewName}}</span>
-                    </button>
-                    }
-                </mat-menu>
-            </div>
-
-            <div class="view-current" [matMenuTriggerFor]="viewMenu">
-                {{ selectedView?.viewName }}
-            </div>
-
-            <div class="spacer"></div>
-
-            @if (allExpanded) {
-            <mat-icon (click)="collapseAll()">toggle_off</mat-icon>
-            }
-            @else {
-            <mat-icon (click)="expandAll()">toggle_on</mat-icon>
-            }
+                    <span>{{view.viewName}}</span>
+                </button>
+                }
+            </mat-menu>
         </div>
+        <div class="view-current" [matMenuTriggerFor]="viewMenu">
+            {{ selectedView?.viewName }}
+        </div>
+
+        <div class="spacer"></div>
+
+        @if (allExpanded) {
+        <mat-icon (click)="collapseAll()">toggle_off</mat-icon>
+        }
+        @else {
+        <mat-icon (click)="expandAll()">toggle_on</mat-icon>
+        }
     </ng-container>
 </lib-dynamic-layout>

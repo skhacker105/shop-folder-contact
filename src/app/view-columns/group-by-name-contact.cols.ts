@@ -13,7 +13,9 @@ export const GROUP_BY_NAME_COLUMNS: IGridView = {
         {
             headerName: 'Phone',
             field: 'mainPhoneNumber',
-            flex: 5
+            flex: 5,
+            hide: false,
+            rowGroup: false
         }
     ],
     autoGroupColumnDef: {

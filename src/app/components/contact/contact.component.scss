@@ -26,30 +26,42 @@
     height: 100%;
     display: flex;
 
-    .spacer {
-        flex: 1 auto;
-    }
+    // .spacer {
+    //     flex: 1 auto;
+    // }
 
-    .mat-icon {
-        line-height: 37px;
-        margin-right: 10px;
-        width: 35px;
-        height: 30px;
-        font-size: 35px;
-    }
+    // .mat-icon {
+    //     line-height: 37px;
+    //     margin-right: 10px;
+    //     width: 35px;
+    //     height: 30px;
+    //     font-size: 35px;
+    // }
 
-    .views-menu {
-        font-size: inherit;
+    // .views-menu {
+    //     font-size: inherit;
 
-        .mat-icon {
-            line-height: 37px;
-            width: 16px;
-            height: 30px;
-            font-size: 25px;
-        }
-    }
+    //     .mat-icon {
+    //         line-height: 37px;
+    //         width: 16px;
+    //         height: 30px;
+    //         font-size: 25px;
+    //     }
+    // }
 }
 
 .selected-view {
     background-color: #f5f7f7;
+}
+
+
+.filter-container {
+    
+    height: 100%;
+    width: 50%;
+}
+
+.filter-nav {
+    height: 100%;
+    width: 50%;
 }
