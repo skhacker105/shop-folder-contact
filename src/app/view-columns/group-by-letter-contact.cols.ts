@@ -16,19 +16,22 @@ export const GROUP_BY_LETTER_COLUMNS: IGridView = {
             field: 'name',
             flex: 7,
             hide: false,
-            rowGroup: false
+            rowGroup: false,
+            resizable: false
         },
         {
             headerName: 'Phone',
             field: 'mainPhoneNumber',
             flex: 5,
             hide: false,
-            rowGroup: false
+            rowGroup: false,
+            resizable: false
         }
     ],
     autoGroupColumnDef: {
         headerName: '',
         width: 85,
+        suppressSizeToFit: true,
         cellClass: 'letter-col',
         headerClass: 'letter-col'
     }

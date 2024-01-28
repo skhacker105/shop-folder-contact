@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DynamicLayoutComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { DBService, GridService, IContact, IGridView } from 'shop-folder-core';
+import { DBService, GridService, IContact, IGridView, ISortBy } from 'shop-folder-core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
@@ -13,6 +13,11 @@ import 'ag-grid-enterprise';
 
 // Views
 import { DEFAULT_COLUMNS, GROUP_BY_LETTER_COLUMNS, GROUP_BY_NAME_COLUMNS, GROUP_BY_TYPE_COLUMNS } from '../../view-columns';
+import { ContactService } from '../../service/contact.service';
+import { forkJoin, takeUntil } from 'rxjs';
+import { ShopFolderLoggerService } from 'shop-folder-logger';
+import { GetContactsResult } from '@capacitor-community/contacts';
+import { ToastrService } from 'ngx-toastr';
 
 const ContactPageViews: IGridView[] = [
   DEFAULT_COLUMNS,
@@ -30,99 +35,30 @@ const ContactPageViews: IGridView[] = [
 })
 export class ContactComponent extends GridService<IContact> implements OnInit {
 
-  constructor(public route: ActivatedRoute, private dbService: DBService) {
+  private defaultSort: ISortBy = {
+    column: 'name',
+    order: 'asc'
+  }
+
+  constructor(
+    public route: ActivatedRoute,
+    private dbService: DBService,
+    private contactService: ContactService,
+    private logger: ShopFolderLoggerService,
+    private toastr: ToastrService
+  ) {
     super(ContactPageViews, route);
     this.useTable(this.dbService.currentDB.contacts);
+    this.setPageSize(50000);
+    this.setSortBy(this.defaultSort);
   }
 
   ngOnInit(): void {
-    this.loadDummyData();
     this.grid.suppressHorizontalScroll = true;
-    // const ct = new Contact('', 0, { name: 'Some Name' });
-    // console.log('db = ', this.dbService.currentDB);
-    // this.dbService.currentDB.contacts.add(ct).then(res => {
-    //   this.refreshData().then(res1 => {
-    //     console.log({ res, res1 });
-    //   });
-    // });
+    this.refreshData();
   }
 
-  loadDummyData() {
-    this.data = [];
-    const realNames = [
-      "Saurabh Kumar",
-      "Diksha Bharti",
-      "John Doe",
-      "Shikhar",
-      "Mahendra Singh Dhoni",
-      "Alice Johnson",
-      "Bob Smith",
-      "Catherine Brown",
-      "David Miller",
-      "Shikhar",
-      "Mahendra Singh Dhoni",
-      "Alice Johnson",
-      "Bob Smith",
-      "Catherine Brown",
-      "David Miller",
-      "Shikhar",
-      "Mahendra Singh Dhoni",
-      "Alice Johnson",
-      "Bob Smith",
-      "Catherine Brown",
-      "David Miller",
-      "Emily Davis",
-      "Frank Wilson",
-      "Grace Martinez",
-      "Henry Taylor",
-      "Isabel Anderson",
-      "Jack White",
-      "Katherine Harris",
-      "Liam Martin",
-      "Mia Thompson",
-      "Nathan Jackson",
-      "Olivia Garcia",
-      "Peter Robinson",
-      "Quinn Lee",
-      "Rachel Turner",
-      "Samuel Harris",
-      "Liam Martin",
-      "Mia Thompson",
-      "Nathan Jackson",
-      "Olivia Garcia",
-      "Peter Robinson",
-      "Quinn Lee",
-      "Rachel Turner",
-      "Samuel Harris",
-      "Sophia Martinez",
-      "Thomas Clark",
-      "Uma Patel",
-      "Victor Adams",
-      "Wendy Parker",
-      "Xander Turner",
-      "Yvonne Mitchell",
-      "Zachary Wright",
-      "Alice Johnson",
-      "Bob Smith",
-      "Catherine Brown",
-      "David Miller",
-    ];
-    const types = [
-      'Supplier', 'Customer', 'Employee', 'Family',
-      'Supplier', 'Customer', 'Employee', 'Family'
-    ]
-    for (let i = 0; i < 56; i++) {
-      let phone = `+91 ${Math.floor(Math.random() * 10000000000).toString().padStart(10, '0')}`;
-      let name = realNames[Math.floor(Math.random() * realNames.length)];
-      const isMe = i % 25 === 0;
-      const start = Math.floor((Math.random() * 8));
-      const end = Math.floor((Math.random() * 8));
-      this.data.push(this.createContact(phone, name, types.slice(start, end), isMe));
-    }
-    this.data.sort((a, b) => a.name.localeCompare(b.name));
-  }
-
-  createContact(mainPhoneNumber: string, name: string, types: string[] = [], isMe = false) {
+  createContact(mainPhoneNumber: string, name: string, types: string[] = [], isMe = false): Contact {
     return new Contact('', 0, {
       createdBy: 0,
       createdOn: new Date(),
@@ -136,9 +72,12 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     })
   }
 
-  handleSelectModeOn() {
+  handleSelectModeOn(): void {
     if (this.selectedView?.autoGroupColumnDef) {
       this.selectedView.autoGroupColumnDef.checkboxSelection = true;
+      if (this.selectedView.autoGroupColumnDef.width)
+        this.selectedView.autoGroupColumnDef.width = this.selectedView.autoGroupColumnDef.width + 35;
+
       this.gridApi.updateGridOptions({
         autoGroupColumnDef: this.selectedView.autoGroupColumnDef
       });
@@ -149,14 +88,17 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
         columnDefs: this.selectedView?.columnDefs
       });
     }
-    this.gridApi.autoSizeAllColumns();
   }
 
-  handleSelectModeOff() {
+  handleSelectModeOff(): void {
     if (this.selectedView?.autoGroupColumnDef) {
       this.selectedView.autoGroupColumnDef.checkboxSelection = false;
+      if (this.selectedView.autoGroupColumnDef.width)
+        this.selectedView.autoGroupColumnDef.width = this.selectedView.autoGroupColumnDef.width - 35;
+      
       this.gridApi.updateGridOptions({
-        autoGroupColumnDef: this.selectedView.autoGroupColumnDef
+        autoGroupColumnDef: this.selectedView.autoGroupColumnDef,
+        columnDefs: this.selectedView?.columnDefs
       });
     } else {
       if (this.selectedView)
@@ -165,8 +107,58 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
         columnDefs: this.selectedView?.columnDefs
       });
     }
-    this.gridApi.autoSizeAllColumns();
   }
 
-  triggerSync() {}
+  triggerSync(): void {
+    this.contactService.getPhoneContacts()
+      .pipe(takeUntil(this.isComponentActive))
+      .subscribe({
+        next: res => this.processPhoneContacts(res),
+        error: err => this.logger.logError('Error while getting phone contact')
+      });
+  }
+
+  processPhoneContacts(phoneContacts: GetContactsResult) {
+    const toAdd = this.filterContactsToAdd(phoneContacts)
+    const toUpdate = this.filterContactsToUpdate(phoneContacts)
+    const obs = [this.selectedTable?.bulkAdd(toAdd), this.selectedTable?.bulkPut(toUpdate)];
+    forkJoin(obs)
+      .pipe(takeUntil(this.isComponentActive))
+      .subscribe({
+        next: res => {
+          this.refreshData();
+          this.toastr.success('Sync completed')
+        },
+        error: err => this.logger.logError('Error while sync: ', err)
+      });
+  }
+
+  filterContactsToAdd(phoneContacts: GetContactsResult): IContact[] {
+    return phoneContacts.contacts.reduce((arr, phoneContact) => {
+      if (this.data.some(uploadedContact => phoneContact.name && phoneContact.name.display && uploadedContact.name.indexOf(phoneContact.name.display) >= 0))
+        return arr;
+
+      const convertedContact = this.contactService.phoneToLocalContact(phoneContact);
+      if (!convertedContact) return arr;
+
+      arr.push(convertedContact);
+      return arr;
+    }, [] as IContact[]);
+  }
+
+  filterContactsToUpdate(phoneContacts: GetContactsResult): IContact[] {
+    return phoneContacts.contacts.reduce((arr, phoneContact) => {
+      const existing = this.data.find(uploadedContact => phoneContact.name && phoneContact.name.display && uploadedContact.name.indexOf(phoneContact.name.display) >= 0)
+      if (!existing) return arr;
+
+      const newNumbers = phoneContact.phones?.filter(p => !existing.otherPhoneNumbers.some(op => op === p.number) && p.number !== existing.mainPhoneNumber);
+      if (!newNumbers) return arr;
+
+      const extractedNumbers = this.contactService.phoneToLocalPayload(newNumbers)
+      existing.otherPhoneNumbers = existing.otherPhoneNumbers.concat(extractedNumbers);
+      arr.push(existing);
+      return arr;
+    }, [] as IContact[]);
+  }
+
 }
