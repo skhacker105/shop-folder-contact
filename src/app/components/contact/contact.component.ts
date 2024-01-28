@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DynamicLayoutComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { GridService, IGridView } from 'shop-folder-core';
-import { ActivatedRoute } from '@angular/router';
+import { DBService, GridService, IContact, IGridView } from 'shop-folder-core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
@@ -24,19 +24,27 @@ const ContactPageViews: IGridView[] = [
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, DynamicLayoutComponent, MatIconModule, AgGridModule, MatMenuModule],
+  imports: [CommonModule, RouterLink, DynamicLayoutComponent, MatIconModule, AgGridModule, MatMenuModule],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss'
 })
-export class ContactComponent extends GridService<Contact> implements OnInit {
+export class ContactComponent extends GridService<IContact> implements OnInit {
 
-  constructor(public route: ActivatedRoute) {
+  constructor(public route: ActivatedRoute, private dbService: DBService) {
     super(ContactPageViews, route);
+    this.useTable(this.dbService.currentDB.contacts);
   }
 
   ngOnInit(): void {
     this.loadDummyData();
     this.grid.suppressHorizontalScroll = true;
+    // const ct = new Contact('', 0, { name: 'Some Name' });
+    // console.log('db = ', this.dbService.currentDB);
+    // this.dbService.currentDB.contacts.add(ct).then(res => {
+    //   this.refreshData().then(res1 => {
+    //     console.log({ res, res1 });
+    //   });
+    // });
   }
 
   loadDummyData() {
@@ -108,7 +116,7 @@ export class ContactComponent extends GridService<Contact> implements OnInit {
       let name = realNames[Math.floor(Math.random() * realNames.length)];
       const isMe = i % 25 === 0;
       const start = Math.floor((Math.random() * 8));
-      const end =  Math.floor((Math.random() * 8));
+      const end = Math.floor((Math.random() * 8));
       this.data.push(this.createContact(phone, name, types.slice(start, end), isMe));
     }
     this.data.sort((a, b) => a.name.localeCompare(b.name));
@@ -159,4 +167,6 @@ export class ContactComponent extends GridService<Contact> implements OnInit {
     }
     this.gridApi.autoSizeAllColumns();
   }
+
+  triggerSync() {}
 }
