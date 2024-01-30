@@ -1,8 +1,8 @@
-<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true" [hideFilter]="false"
+<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true" [hideFilter]="false" [selectMode]="selectMode"
     (selectModeChange)="handleSelectModeChange($event)">
     <ng-container selectaction>
         @if (gridApi && gridApi.getSelectedRows().length > 0){
-        <mat-icon>delete</mat-icon>
+        <mat-icon (click)="handleDeleteClick()">delete</mat-icon>
         }
     </ng-container>
 

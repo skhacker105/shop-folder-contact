@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { DynamicLayoutComponent } from 'shop-folder-component';
+import { ConfirmationDialogComponent, DynamicLayoutComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { DBService, GridService, IContact, IGridView, ISortBy } from 'shop-folder-core';
+import { DBService, GridService, IConfirmation, IContact, IGridView, ISortBy, UserService } from 'shop-folder-core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
@@ -18,6 +18,7 @@ import { forkJoin, takeUntil } from 'rxjs';
 import { ShopFolderLoggerService } from 'shop-folder-logger';
 import { GetContactsResult } from '@capacitor-community/contacts';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
 
 const ContactPageViews: IGridView[] = [
   DEFAULT_COLUMNS,
@@ -45,9 +46,15 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     private dbService: DBService,
     private contactService: ContactService,
     private logger: ShopFolderLoggerService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    public dialog: MatDialog,
+    public userService: UserService 
   ) {
-    super(ContactPageViews, route);
+    super({
+      allViews: ContactPageViews,
+      userService,
+      route
+    }, Contact);
     this.useTable(this.dbService.currentDB.contacts);
     this.setPageSize(50000);
     this.setSortBy(this.defaultSort);
@@ -56,20 +63,6 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
   ngOnInit(): void {
     this.grid.suppressHorizontalScroll = true;
     this.refreshData();
-  }
-
-  createContact(mainPhoneNumber: string, name: string, types: string[] = [], isMe = false): Contact {
-    return new Contact('', 0, {
-      createdBy: 0,
-      createdOn: new Date(),
-      isMe,
-      isSelected: false,
-      mainPhoneNumber,
-      name,
-      openingBalance: 0,
-      otherPhoneNumbers: [],
-      types
-    })
   }
 
   handleSelectModeOn(): void {
@@ -95,7 +88,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       this.selectedView.autoGroupColumnDef.checkboxSelection = false;
       if (this.selectedView.autoGroupColumnDef.width)
         this.selectedView.autoGroupColumnDef.width = this.selectedView.autoGroupColumnDef.width - 35;
-      
+
       this.gridApi.updateGridOptions({
         autoGroupColumnDef: this.selectedView.autoGroupColumnDef,
         columnDefs: this.selectedView?.columnDefs
@@ -159,6 +152,30 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       arr.push(existing);
       return arr;
     }, [] as IContact[]);
+  }
+
+  handleDeleteClick() {
+    const ref = this.dialog.open(ConfirmationDialogComponent, {
+      data: this.confirmDeleteConfig
+    });
+    ref.afterClosed()
+      .pipe(takeUntil(this.isComponentActive))
+      .subscribe({
+        next: res => res ? this.deleteSelectedContacts() : null,
+        error: err => this.logger.log('Error while delete confirmation: ', err)
+      });
+  }
+
+  async deleteSelectedContacts() {
+    if (!this.selectedTable) return;
+    this.isDataLoading = true;
+
+    try {
+      await this.selectedTable.bulkDelete(this.selectedIds);
+      this.refreshData();
+      this.handleSelectModeChange(false);
+    } catch (err) { }
+    finally { this.isDataLoading = false; }
   }
 
 }

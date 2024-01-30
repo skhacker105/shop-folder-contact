@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ContactPayload, GetContactsResult, PhonePayload } from '@capacitor-community/contacts';
 import { Observable } from 'rxjs';
-import { IContact } from 'shop-folder-core';
+import { IContact, UserService } from 'shop-folder-core';
 import { Contact } from '../models';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { Contact } from '../models';
 })
 export class ContactService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private userService: UserService) { }
 
   getPhoneContacts(): Observable<GetContactsResult> {
     // if (!environment.local)
@@ -36,7 +36,7 @@ export class ContactService {
 
   phoneToLocalContact(phoneContact: ContactPayload): Contact | undefined {
     if (!phoneContact.name || !phoneContact.phones) return;
-    return new Contact('', 0, {
+    return new Contact(this.userService.getUser(), {
       name: phoneContact.name.display,
       mainPhoneNumber: phoneContact.phones[0].number,
       otherPhoneNumbers: phoneContact.phones.slice(1, phoneContact.phones.length).map(p => p.number),

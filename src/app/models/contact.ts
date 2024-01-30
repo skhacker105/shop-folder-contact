@@ -1,4 +1,4 @@
-import { ICompareOutput, IContact } from "shop-folder-core";
+import { ICompareOutput, IContact, IUser } from "shop-folder-core";
 
 export class Contact implements IContact {
     name: string;
@@ -12,14 +12,14 @@ export class Contact implements IContact {
     isSelected: boolean;
     types: string[];
 
-    constructor(userContactNumber: string, userContactId: number, contactObj?: any) {
+    constructor(deviceUser: IUser, contactObj?: any) {
         this.name = contactObj && contactObj.name ? contactObj.name : '';
         this.mainPhoneNumber = contactObj && contactObj.mainPhoneNumber ? contactObj.mainPhoneNumber : '';
         this.otherPhoneNumbers = contactObj && contactObj.otherPhoneNumbers ? contactObj.otherPhoneNumbers : [];
         this.openingBalance = contactObj && contactObj.openingBalance ? contactObj.openingBalance : 0;
         this.types = contactObj && contactObj.types ? contactObj.types : [];
-        this.isMe = this.checkIfItIsMe(userContactNumber);
-        this.createdBy = contactObj && contactObj.createdBy ? contactObj.createdBy : userContactId;
+        this.isMe = this.checkIfItIsMe(deviceUser.mainPhoneNumber);
+        this.createdBy = contactObj && contactObj.createdBy ? contactObj.createdBy : deviceUser.selectedFolderContactId;
         this.createdOn = contactObj && contactObj.createdOn ? contactObj.createdOn : new Date();
         this.isSelected = false;
     }
