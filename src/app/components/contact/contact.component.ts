@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationDialogComponent, DynamicLayoutComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { DBService, GridService, IConfirmation, IContact, IGridView, ISortBy, UserService } from 'shop-folder-core';
+import { DBService, FilterFunction, GridService, IConfirmation, IContact, IFilterOptions, IGridView, IMultiValueFilter, ISortBy, UserService, anyFilters } from 'shop-folder-core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
@@ -19,6 +19,7 @@ import { ShopFolderLoggerService } from 'shop-folder-logger';
 import { GetContactsResult } from '@capacitor-community/contacts';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
+import { Collection } from 'dexie';
 
 const ContactPageViews: IGridView[] = [
   DEFAULT_COLUMNS,
@@ -41,6 +42,8 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     order: 'asc'
   }
 
+  pageFilters: anyFilters[] = [];
+
   constructor(
     public route: ActivatedRoute,
     private dbService: DBService,
@@ -48,13 +51,13 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     private logger: ShopFolderLoggerService,
     private toastr: ToastrService,
     public dialog: MatDialog,
-    public userService: UserService 
+    public userService: UserService
   ) {
     super({
       allViews: ContactPageViews,
-      userService,
+      objectCreator: (obj: any) => this.contactObjectCreator(obj),
       route
-    }, Contact);
+    });
     this.useTable(this.dbService.currentDB.contacts);
     this.setPageSize(50000);
     this.setSortBy(this.defaultSort);
@@ -62,7 +65,47 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
 
   ngOnInit(): void {
     this.grid.suppressHorizontalScroll = true;
+    this.createPageFilters();
     this.refreshData();
+  }
+
+  contactObjectCreator(obj: any) {
+    return new Contact(this.userService.getUser(), obj);
+  }
+
+  createPageFilters() {
+    if (!this.selectedTable) return;
+
+    this.pageFilters = [
+      {
+        column: 'types',
+        description: 'Filter your data by tags',
+        filterType: 'multiValue',
+        name: 'Categories',
+        options: [] as IFilterOptions[],
+        type: 'chip',
+        createFilterFunction: (selectedOptions) => {
+          return (collection: Collection<IContact, number>) => {
+            return collection.filter(contact =>
+              contact.types.some(type =>
+                selectedOptions.some(option =>
+                  option.label === type)));
+          }
+        },
+        getOptions: async () => {
+          const data: IFilterOptions[] = (
+            await this.dbService.currentDB.contactTypes.toArray()
+          )
+          .map(contactType => {
+            return {
+              label: contactType.name,
+              value: contactType.id
+            } as IFilterOptions
+          });
+          return data;
+        },
+      } as IMultiValueFilter
+    ]
   }
 
   handleSelectModeOn(): void {
