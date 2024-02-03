@@ -1,0 +1,116 @@
+<lib-dynamic-layout [title]="creationTypeHeaderText" backURL="/contact" [hideDrawer]="true">
+
+    <!-- Body -->
+    <ng-container pagebody>
+        @if (!contactSelectionCompleted) {
+            <ng-container [ngTemplateOutlet]="contactSearch"></ng-container>
+        } @else if (contactSelectionCompleted) {
+            @if (creationType === 'group') {
+                <ng-container [ngTemplateOutlet]="contactGroupName"></ng-container>
+            } @else if (creationType === 'tag') {
+                <ng-container [ngTemplateOutlet]="contactTags"></ng-container>
+            }
+        }
+    </ng-container>
+
+
+    <ng-container pagefooter>
+        <div class="footer">
+            @if (selectedContacts.length > 0) {
+                <div class="text">
+                    {{selectedContacts.length}} Contacts
+
+                    @if (contactSelectionCompleted) {
+                        &nbsp;
+                        @if (creationType === 'group' && contactGroupNameCtrl.value) {
+                            for Group {{ contactGroupNameCtrl.value }}
+                        }
+                        @else if (creationType === 'tag' && contactTypeSelected) {
+                            with {{ contactTypeSelected }} Tags
+                        }
+                    }
+                </div>
+            }
+
+            <div class="spacer"></div>
+
+            @if (!contactSelectionCompleted && gridApi && gridApi.getSelectedNodes() && gridApi.getSelectedNodes().length > 0) {
+                <button mat-raised-button color="accent" (click)="loadSelectedIdsAndProceed()">Next</button>
+            } @else if (contactSelectionCompleted) {
+                @if (creationType === 'group' && contactGroupNameCtrl.value) {
+                    <button mat-raised-button color="accent" (click)="addNewGroup()">Create</button>
+                }
+                @else if (creationType === 'tag' && contactTypeSelected) {
+                    <button mat-raised-button color="accent" (click)="updateTags()">Save</button>
+                }
+            }
+        </div>
+    </ng-container>
+
+</lib-dynamic-layout>
+
+
+<ng-template #contactSearch>
+    <div class="contact-search-container">
+
+        <!-- Search box -->
+        <mat-form-field class="contact-search-input">
+            <mat-label>Search Contact By Name</mat-label>
+            <input matInput type="text" [formControl]="conactSearchCtrl">
+            @if (conactSearchCtrl.value) {
+                <button matSuffix mat-icon-button (click)="conactSearchCtrl.reset();">
+                    <mat-icon>close</mat-icon>
+                </button>
+            }
+        </mat-form-field>
+
+        <!-- Contact List -->
+        <div class="contact-list">
+            <ag-grid-angular class="table-view ag-theme-balham" [gridOptions]="grid" [rowData]="data"
+                [columnDefs]="selectedView?.columnDefs" [defaultColDef]="defaultColDef" [groupDefaultExpanded]="1"
+                [groupSelectsChildren]="true" rowSelection="multiple" (gridReady)="onGridReady($event)"
+                (selectionChanged)="onSelectionChanged()">
+            </ag-grid-angular>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #contactGroupName>
+    <div class="group-name">
+        <div class="group-name-box">
+            <mat-form-field>
+                <mat-label> Group Name </mat-label>
+                <input matInput type="text" [formControl]="contactGroupNameCtrl" placeholder="...">
+                @if (contactGroupNameCtrl.value) {
+                  <button matSuffix mat-icon-button aria-label="Clear" (click)="contactGroupNameCtrl.reset()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
+              </mat-form-field>
+        </div>
+
+        <div class="group-name-action">
+            <button mat-raised-button color="primary" (click)="addNewGroup()">
+            Create Group
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #contactTags>
+    <div class="contact-type-selector">
+        <mat-chip-listbox multiple="true" class="contact-type-listbox" (change)="onValueChange($event)">
+            @for (contactType of contactTypes; track contactType.name) {
+                <mat-chip-option [selected]="contactType.isSelected" (click)="contactType.isSelected = !contactType.isSelected" [value]="contactType">
+                    {{ contactType.name }}
+                </mat-chip-option>
+            }
+        </mat-chip-listbox>
+        
+        <button mat-icon-button color="accent" class="add-contact-type" (click)="addNewContactType()">
+            <mat-icon>add_circle</mat-icon>
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #contactTags></ng-template>

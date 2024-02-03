@@ -13,6 +13,7 @@ export class Contact implements IContact {
     types: string[];
 
     constructor(deviceUser: IUser, contactObj?: any) {
+        this.id = contactObj && contactObj.id ? contactObj.id : undefined;
         this.name = contactObj && contactObj.name ? contactObj.name : '';
         this.mainPhoneNumber = contactObj && contactObj.mainPhoneNumber ? contactObj.mainPhoneNumber : '';
         this.otherPhoneNumbers = contactObj && contactObj.otherPhoneNumbers ? contactObj.otherPhoneNumbers : [];
@@ -22,6 +23,12 @@ export class Contact implements IContact {
         this.createdBy = contactObj && contactObj.createdBy ? contactObj.createdBy : deviceUser.selectedFolderContactId;
         this.createdOn = contactObj && contactObj.createdOn ? contactObj.createdOn : new Date();
         this.isSelected = false;
+    }
+
+    updateType(newTypes: string[]) {
+        this.types = this.types.filter(t => t ? true : false);
+        const newOnes = newTypes.filter(nt => !this.types.some(t => t === nt));
+        this.types = this.types.concat(newTypes);
     }
 
     markSelected(): void {

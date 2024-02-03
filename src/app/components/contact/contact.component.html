@@ -2,7 +2,9 @@
     [filters]="pageFilters" (selectModeChange)="handleSelectModeChange($event)" (onFilterUpdate)="handleFilterUpdate($event)">
     <ng-container selectaction>
         @if (gridApi && gridApi.getSelectedRows().length > 0){
-        <mat-icon (click)="handleDeleteClick()">delete</mat-icon>
+            <mat-icon>new_label</mat-icon>
+            <mat-icon (click)="handleGroupClick()"><lib-group-logo></lib-group-logo></mat-icon>
+            <mat-icon (click)="handleDeleteClick()">delete</mat-icon>
         }
     </ng-container>
 
@@ -34,7 +36,7 @@
                 <button mat-menu-item (click)="updateSelectedView(view)" [ngClass]="{
                             'bg-selected-row text-selected-row': selectedView?.viewName === view.viewName
                         }">
-                    <span>{{view.viewName}}</span>
+                    <span>{{ view.viewName }}</span>
                 </button>
                 }
             </mat-menu>

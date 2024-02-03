@@ -1,0 +1,89 @@
+.contact-search-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .contact-search-input {
+        width: 100%;
+
+        ::ng-deep {
+            .mat-mdc-form-field-subscript-wrapper {
+                display: none;
+            }
+        }
+    }
+
+    .contact-list {
+        height: calc(100vh - 127px);
+        width: 100%;
+
+        .table-view {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+.footer {
+    display: flex;
+    width: 100%;
+
+    .text {
+        padding-left: 10px;
+    }
+
+    .spacer {
+        flex: 1 auto;
+    }
+}
+
+.group-name {
+    width: 100vw;
+    height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffffe3;
+
+    .group-name-box {
+        margin-top: auto;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .group-name-action {
+        margin-bottom: auto;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.contact-type-selector {
+    width: 100vw;
+    height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffffe3;
+    overflow-y: auto;
+
+    .contact-type-listbox {
+        margin: auto;
+    }
+
+    .mat-mdc-chip-option, .add-contact-type {
+        padding: 5px;
+        min-width: 80vw;
+        margin-left: auto;
+        margin-right: auto;
+
+        ::ng-deep {
+            .mat-mdc-chip-action {
+                width: 100%;
+
+                .mat-mdc-chip-action-label {
+                    flex: 1 auto;
+                }
+            }
+        }
+    }
+}

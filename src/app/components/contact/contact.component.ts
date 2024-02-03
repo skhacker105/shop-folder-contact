@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationDialogComponent, DynamicLayoutComponent } from 'shop-folder-component';
+import { ConfirmationDialogComponent, DynamicLayoutComponent, InputComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { DBService, FilterFunction, GridService, IConfirmation, IContact, IFilterOptions, IGridView, IMultiValueFilter, ISortBy, UserService, anyFilters } from 'shop-folder-core';
+import { DBService, GridService, IContact, IFilterOptions, IGridView, IInput, IMultiValueFilter, ISortBy, UserService, anyFilters } from 'shop-folder-core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
@@ -14,12 +14,12 @@ import 'ag-grid-enterprise';
 // Views
 import { DEFAULT_COLUMNS, GROUP_BY_LETTER_COLUMNS, GROUP_BY_NAME_COLUMNS, GROUP_BY_TYPE_COLUMNS } from '../../view-columns';
 import { ContactService } from '../../service/contact.service';
-import { forkJoin, takeUntil } from 'rxjs';
+import { take } from 'rxjs';
 import { ShopFolderLoggerService } from 'shop-folder-logger';
-import { GetContactsResult } from '@capacitor-community/contacts';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Collection } from 'dexie';
+import { GroupLogoComponent } from 'shop-folder-logo';
 
 const ContactPageViews: IGridView[] = [
   DEFAULT_COLUMNS,
@@ -31,9 +31,10 @@ const ContactPageViews: IGridView[] = [
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, RouterLink, DynamicLayoutComponent, MatIconModule, AgGridModule, MatMenuModule],
+  imports: [CommonModule, RouterLink, DynamicLayoutComponent, MatIconModule, AgGridModule, MatMenuModule, GroupLogoComponent],
   templateUrl: './contact.component.html',
-  styleUrl: './contact.component.scss'
+  styleUrl: './contact.component.scss',
+  providers: [ContactService]
 })
 export class ContactComponent extends GridService<IContact> implements OnInit {
 
@@ -96,12 +97,12 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
           const data: IFilterOptions[] = (
             await this.dbService.currentDB.contactTypes.toArray()
           )
-          .map(contactType => {
-            return {
-              label: contactType.name,
-              value: contactType.id
-            } as IFilterOptions
-          });
+            .map(contactType => {
+              return {
+                label: contactType.name,
+                value: contactType.id
+              } as IFilterOptions
+            });
           return data;
         },
       } as IMultiValueFilter
@@ -145,80 +146,61 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     }
   }
 
-  triggerSync(): void {
-    this.contactService.getPhoneContacts()
-      .pipe(takeUntil(this.isComponentActive))
+  handleGroupClick() {
+    const groupCreateConfig: IInput = {
+      color: 'primary',
+      label: 'Group Name',
+      title: 'New Group',
+    };
+    const dialofref = this.dialog.open(InputComponent, { data: groupCreateConfig });
+    dialofref.afterClosed()
+      .pipe(take(1))
       .subscribe({
-        next: res => this.processPhoneContacts(res),
-        error: err => this.logger.logError('Error while getting phone contact')
+        next: res => res ? this.addNewGroup(res) : null
       });
   }
 
-  processPhoneContacts(phoneContacts: GetContactsResult) {
-    const toAdd = this.filterContactsToAdd(phoneContacts)
-    const toUpdate = this.filterContactsToUpdate(phoneContacts)
-    const obs = [this.selectedTable?.bulkAdd(toAdd), this.selectedTable?.bulkPut(toUpdate)];
-    forkJoin(obs)
-      .pipe(takeUntil(this.isComponentActive))
+  addNewGroup(groupName: string) {
+    if (this.selectedIds.length === 0) return;
+    
+    this.contactService.createNewGroup(groupName, this.getSelectedData())
+    .pipe(take(1))
+    .subscribe({
+      next: res => {
+        // route to groups page pending
+        this.toastr.success('Contact group created.');
+      },
+      error: err => this.logger.logError('Error while adding new group.')
+    });
+  }
+
+  triggerSync() {
+    if (!this.selectedTable) return;
+
+    this.contactService.triggerSync(this.data)
+      .pipe(take(1))
       .subscribe({
         next: res => {
+          this.toastr.success('Sync completed');
           this.refreshData();
-          this.toastr.success('Sync completed')
+          this.handleSelectModeChange(false);
         },
-        error: err => this.logger.logError('Error while sync: ', err)
+        error: err => this.logger.logError('Error while syncing database: ', err)
       });
-  }
-
-  filterContactsToAdd(phoneContacts: GetContactsResult): IContact[] {
-    return phoneContacts.contacts.reduce((arr, phoneContact) => {
-      if (this.data.some(uploadedContact => phoneContact.name && phoneContact.name.display && uploadedContact.name.indexOf(phoneContact.name.display) >= 0))
-        return arr;
-
-      const convertedContact = this.contactService.phoneToLocalContact(phoneContact);
-      if (!convertedContact) return arr;
-
-      arr.push(convertedContact);
-      return arr;
-    }, [] as IContact[]);
-  }
-
-  filterContactsToUpdate(phoneContacts: GetContactsResult): IContact[] {
-    return phoneContacts.contacts.reduce((arr, phoneContact) => {
-      const existing = this.data.find(uploadedContact => phoneContact.name && phoneContact.name.display && uploadedContact.name.indexOf(phoneContact.name.display) >= 0)
-      if (!existing) return arr;
-
-      const newNumbers = phoneContact.phones?.filter(p => !existing.otherPhoneNumbers.some(op => op === p.number) && p.number !== existing.mainPhoneNumber);
-      if (!newNumbers) return arr;
-
-      const extractedNumbers = this.contactService.phoneToLocalPayload(newNumbers)
-      existing.otherPhoneNumbers = existing.otherPhoneNumbers.concat(extractedNumbers);
-      arr.push(existing);
-      return arr;
-    }, [] as IContact[]);
   }
 
   handleDeleteClick() {
-    const ref = this.dialog.open(ConfirmationDialogComponent, {
-      data: this.confirmDeleteConfig
-    });
-    ref.afterClosed()
-      .pipe(takeUntil(this.isComponentActive))
-      .subscribe({
-        next: res => res ? this.deleteSelectedContacts() : null,
-        error: err => this.logger.log('Error while delete confirmation: ', err)
-      });
-  }
-
-  async deleteSelectedContacts() {
     if (!this.selectedTable) return;
-    this.isDataLoading = true;
 
-    try {
-      await this.selectedTable.bulkDelete(this.selectedIds);
-      this.refreshData();
-      this.handleSelectModeChange(false);
-    } catch (err) { }
-    finally { this.isDataLoading = false; }
+    this.contactService.handleDeleteClick(this.confirmDeleteConfig, this.selectedIds)
+      .pipe(take(1))
+      .subscribe({
+        next: res => {
+          this.refreshData();
+          this.handleSelectModeChange(false);
+        },
+        error: err => this.logger.logError('Error while deleting contacts: ', err)
+      });
   }
 
 }
