@@ -17,6 +17,11 @@ export const DEFAULT_COLUMNS: IGridView = {
             flex: 5,
             hide: false,
             rowGroup: false
+        },
+        {
+            field: 'types',
+            rowGroup: false,
+            hide: true,
         }
     ],
     autoGroupColumnDef: undefined

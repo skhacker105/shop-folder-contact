@@ -28,7 +28,7 @@ export class Contact implements IContact {
     updateType(newTypes: string[]) {
         this.types = this.types.filter(t => t ? true : false);
         const newOnes = newTypes.filter(nt => !this.types.some(t => t === nt));
-        this.types = this.types.concat(newTypes);
+        this.types = this.types.concat(newOnes);
     }
 
     markSelected(): void {

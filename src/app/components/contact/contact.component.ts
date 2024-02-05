@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationDialogComponent, DynamicLayoutComponent, InputComponent } from 'shop-folder-component';
+import { DynamicLayoutComponent, InputComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { DBService, GridService, IContact, IFilterOptions, IGridView, IInput, IMultiValueFilter, ISortBy, UserService, anyFilters } from 'shop-folder-core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { DBService, FilterFunction, GridService, IContact, IFilterOptions, IGridView, IInput, IMultiValueFilter, ISortBy, UserService, anyFilters, isMultiValueFilter } from 'shop-folder-core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
@@ -52,6 +52,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     private logger: ShopFolderLoggerService,
     private toastr: ToastrService,
     public dialog: MatDialog,
+    private router: Router,
     public userService: UserService
   ) {
     super({
@@ -66,6 +67,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
 
   ngOnInit(): void {
     this.grid.suppressHorizontalScroll = true;
+    this.handleSelectModeChange(false);
     this.createPageFilters();
     this.refreshData();
   }
@@ -85,17 +87,19 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
         name: 'Categories',
         options: [] as IFilterOptions[],
         type: 'chip',
-        createFilterFunction: (selectedOptions) => {
-          return (collection: Collection<IContact, number>) => {
+        selectedOptions: [],
+        createMultiFilter: (selectedOptions) => {
+          return selectedOptions.length === 0 ? undefined : (collection: Collection<IContact, number>) => {
             return collection.filter(contact =>
               contact.types.some(type =>
-                selectedOptions.some(option =>
-                  option.label === type)));
+                selectedOptions.some(option => option.label === type)
+              )
+            );
           }
         },
         getOptions: async () => {
           const data: IFilterOptions[] = (
-            await this.dbService.currentDB.contactTypes.toArray()
+            await this.dbService.currentDB.contactTypes.orderBy('name').toArray()
           )
             .map(contactType => {
               return {
@@ -116,18 +120,22 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
         this.selectedView.autoGroupColumnDef.width = this.selectedView.autoGroupColumnDef.width + 35;
 
       this.gridApi.updateGridOptions({
-        autoGroupColumnDef: this.selectedView.autoGroupColumnDef
+        autoGroupColumnDef: this.selectedView.autoGroupColumnDef,
+        columnDefs: this.selectedView?.columnDefs
       });
     } else {
       if (this.selectedView)
         this.selectedView.columnDefs[0].checkboxSelection = true;
       this.gridApi.updateGridOptions({
+        autoGroupColumnDef: undefined,
         columnDefs: this.selectedView?.columnDefs
       });
     }
   }
 
   handleSelectModeOff(): void {
+    if (!this.gridApi) return;
+
     if (this.selectedView?.autoGroupColumnDef) {
       this.selectedView.autoGroupColumnDef.checkboxSelection = false;
       if (this.selectedView.autoGroupColumnDef.width)
@@ -141,6 +149,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       if (this.selectedView)
         this.selectedView.columnDefs[0].checkboxSelection = false;
       this.gridApi.updateGridOptions({
+        autoGroupColumnDef: undefined,
         columnDefs: this.selectedView?.columnDefs
       });
     }
@@ -162,16 +171,17 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
 
   addNewGroup(groupName: string) {
     if (this.selectedIds.length === 0) return;
-    
+
     this.contactService.createNewGroup(groupName, this.getSelectedData())
-    .pipe(take(1))
-    .subscribe({
-      next: res => {
-        // route to groups page pending
-        this.toastr.success('Contact group created.');
-      },
-      error: err => this.logger.logError('Error while adding new group.')
-    });
+      .pipe(take(1))
+      .subscribe({
+        next: res => {
+          this.toastr.success('Contact group created.');
+          // this.updateSelectedView(GROUP_BY_TYPE_COLUMNS);
+          // this.handleSelectModeOff();
+        },
+        error: err => this.logger.logError('Error while adding new group.')
+      });
   }
 
   triggerSync() {
@@ -201,6 +211,24 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
         },
         error: err => this.logger.logError('Error while deleting contacts: ', err)
       });
+  }
+
+  handleContactTagClick() {
+    if (this.selectedIds.length === 0) return;
+
+    this.router.navigateByUrl(`/contact/addEditGroup?creationType=tag&selectedIds=${this.selectedIds}`);
+  }
+
+  handleFilterOptions(updatedFilters: anyFilters[]) {
+    let filterfunctions: FilterFunction<IContact>[] = [];
+    updatedFilters.forEach(filter => {
+      if (filter && isMultiValueFilter(filter) && filter.createMultiFilter) {
+        const fn = filter.createMultiFilter(filter.selectedOptions);
+        if (fn) filterfunctions.push(fn);
+      }
+    });
+    super.handleFilterUpdate(filterfunctions);
+    this.pageFilters = updatedFilters;
   }
 
 }

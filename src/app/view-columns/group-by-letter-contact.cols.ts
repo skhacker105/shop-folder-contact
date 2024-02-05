@@ -26,13 +26,22 @@ export const GROUP_BY_LETTER_COLUMNS: IGridView = {
             hide: false,
             rowGroup: false,
             resizable: false
+        },
+        {
+            field: 'types',
+            rowGroup: false,
+            hide: true,
         }
     ],
     autoGroupColumnDef: {
         headerName: '',
-        width: 85,
+        width: 125,
+        flex: undefined,
         suppressSizeToFit: true,
         cellClass: 'letter-col',
-        headerClass: 'letter-col'
+        headerClass: 'letter-col',
+        sort: 'asc',
+        comparator: undefined,
+        cellStyle: undefined
     }
 };

@@ -3,14 +3,10 @@ import { ContactComponent } from './components/contact/contact.component';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { AddEditContactGroupComponent } from './components/add-edit-contact-group/add-edit-contact-group.component';
 
-export const routes: Routes = [
+
+export const childRoutes: Routes = [
     {
         path: '',
-        redirectTo: 'home',
-        pathMatch: 'full'
-    },
-    {
-        path: 'contact',
         redirectTo: 'home',
         pathMatch: 'full'
     },
@@ -21,6 +17,18 @@ export const routes: Routes = [
     {
         path: 'addEditGroup',
         component: AddEditContactGroupComponent
+    }
+]; 
+
+export const routes: Routes = [
+    {
+        path: '',
+        redirectTo: 'contact/home',
+        pathMatch: 'full'
+    },
+    {
+        path: 'contact',
+        children: childRoutes
     },
     {
         path: 'login',

@@ -14,12 +14,14 @@ import { ContactService } from '../../service/contact.service';
 import { ShopFolderLoggerService } from 'shop-folder-logger';
 import { Contact } from '../../models';
 import { ToastrService } from 'ngx-toastr';
+import { GROUP_BY_TYPE_COLUMNS } from '../../view-columns';
 
 const gridView: IGridView = {
   columnDefs: [
     {
       field: 'name',
       checkboxSelection: true,
+      sort: 'asc'
     },
     {
       field: 'mainPhoneNumber',
@@ -61,7 +63,8 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
     private toastr: ToastrService
   ) {
     super({
-      allViews: [gridView]
+      allViews: [gridView],
+      route: route
     });
     this.useTable(this.dbService.currentDB.contacts);
     this.setPageSize(50000);
@@ -96,6 +99,7 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
     this.route.queryParams
       .pipe(take(1))
       .subscribe((params: any) => {
+        console.log(params)
         this.selectedIds = params.selectedIds ? params.selectedIds.split(',').map((id: string) => +id) : [];
         this.creationType = params.creationType ? params.creationType : this.creationType;
         this.loadSelectedIdsAndProceed();
@@ -137,14 +141,14 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
       title: 'Add'
     };
     this.contactService.handleAddNewContactType(inputConfig, this.userService.getUser())
-    .pipe(
-      take(1)
-    ).subscribe({
-      next: res => {
-        this.loadContactTypes();
-      },
-      error: err => this.logger.logError('Error while adding contact type')
-    });
+      .pipe(
+        take(1)
+      ).subscribe({
+        next: res => {
+          this.loadContactTypes();
+        },
+        error: err => this.logger.logError('Error while adding contact type')
+      });
   }
 
   onValueChange(changeValue: MatChipListboxChange) {
@@ -156,30 +160,44 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
 
     const selectedStr = this.selectedOptions.map(o => o.name);
     this.contactService.updateContactTypes(this.selectedContacts, selectedStr)
-    .pipe(take(1))
-    .subscribe({
-      next: res => {
-        this.toastr.success(`Tags updated`)
-        // this.router.navigateByUrl(environment.contact);
-      },
-      error: err => this.logger.logError('Error while updating contact types.')
-    });
+      .pipe(take(1))
+      .subscribe({
+        next: res => {
+          this.toastr.success(`Tags updated`);
+          this.router.navigateByUrl(`/contact?view=${GROUP_BY_TYPE_COLUMNS.viewName}`);
+          // this.router.navigateByUrl(environment.contact);
+        },
+        error: err => this.logger.logError('Error while updating contact types.')
+      });
   }
 
   addNewGroup() {
     if (!this.contactGroupNameCtrl.value || this.selectedIds.length === 0) return;
-    
+
     this.contactService.createNewGroup(this.contactGroupNameCtrl.value, this.getSelectedData())
-    .pipe(take(1))
-    .subscribe({
-      next: res => {
-        // route to groups page pending
-        this.toastr.success('Contact group created.');
-      },
-      error: err => {
-        this.logger.logError('Error while adding new group.');
-        console.log(err);
-      }
+      .pipe(take(1))
+      .subscribe({
+        next: res => {
+          this.toastr.success('Contact group created.');
+          // this.router.navigate([])
+        },
+        error: err => {
+          this.logger.logError('Error while adding new group.');
+          console.log(err);
+        }
+      });
+  }
+
+  goBackToContactSelection() {
+    this.contactSelectionCompleted = false;
+    setTimeout(() => {
+      this.updateSelectedIdsToGrid();
+    }, 100);
+  }
+
+  updateSelectedIdsToGrid() {
+    this.gridApi?.forEachNode(row => {
+      if (this.selectedIds.some(id => row.data.id === id)) row.setSelected(true);
     });
   }
 

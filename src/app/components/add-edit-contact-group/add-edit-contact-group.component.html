@@ -77,6 +77,7 @@
 
 <ng-template #contactGroupName>
     <div class="group-name">
+        <ng-container [ngTemplateOutlet]="backToContactSelection"></ng-container>
         <div class="group-name-box">
             <mat-form-field>
                 <mat-label> Group Name </mat-label>
@@ -99,6 +100,7 @@
 
 <ng-template #contactTags>
     <div class="contact-type-selector">
+        <ng-container [ngTemplateOutlet]="backToContactSelection"></ng-container>
         <mat-chip-listbox multiple="true" class="contact-type-listbox" (change)="onValueChange($event)">
             @for (contactType of contactTypes; track contactType.name) {
                 <mat-chip-option [selected]="contactType.isSelected" (click)="contactType.isSelected = !contactType.isSelected" [value]="contactType">
@@ -113,4 +115,8 @@
     </div>
 </ng-template>
 
-<ng-template #contactTags></ng-template>
+<ng-template #backToContactSelection>
+    <div class="back-to-contact-select">
+        <mat-icon color="warn" (click)="goBackToContactSelection()">backspace</mat-icon>
+    </div>
+</ng-template>

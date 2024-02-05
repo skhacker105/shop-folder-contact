@@ -5,26 +5,35 @@ export const GROUP_BY_TYPE_COLUMNS: IGridView = {
     isDefault: false,
     columnDefs: [
         {
-            headerName: 'Contact',
-            field: 'name',
-            flex: 1,
+            field: 'types',
             rowGroup: true,
+            valueGetter: (params) => params.data.types ? params.data.types.join('') : '',
             hide: true,
         },
         {
-            headerName: 'Tags',
-            field: 'types',
-            flex: 3,
-            cellStyle: {
-                'font-size': '10px'
-            },
-            hide: false,
-            rowGroup: false
+            headerName: 'Contact',
+            field: 'name',
+            flex: 1,
+            rowGroup: false,
         }
     ],
     autoGroupColumnDef: {
-        headerName: 'Contact',
+        headerName: 'Type',
         flex: 1,
         sort: 'asc',
+        comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
+            if (!valueA) valueA = [];
+            if (!valueB) valueB = [];
+            
+            if (valueA.length === 0 && valueB.length === 0) return nodeA.data.name.localeCompare(nodeB.data.name);
+            else if (valueA.length > 0 && valueB.length === 0) return -1;
+            else if (valueB.length > 0 && valueA.length === 0) return 1;
+            else {
+                return valueA.localeCompare(valueB)
+            }
+        },
+        cellStyle: {
+            'font-size': '10px'
+        }
     }
 };
