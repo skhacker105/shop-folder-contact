@@ -107,11 +107,14 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
       });
   }
 
+  override createPageFilters(): void {
+    // throw new Error('Method not implemented.');
+  }
   override handleSelectModeOn(): void {
-    throw new Error('Method not implemented.');
+    // throw new Error('Method not implemented.');
   }
   override handleSelectModeOff(): void {
-    throw new Error('Method not implemented.');
+    // throw new Error('Method not implemented.');
   }
 
   async loadSelectedIdsAndProceed() {

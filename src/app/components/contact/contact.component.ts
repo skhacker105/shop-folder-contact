@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DynamicLayoutComponent, InputComponent } from 'shop-folder-component';
 import { MatIconModule } from '@angular/material/icon'
-import { DBService, FilterFunction, GridService, IContact, IFilterOptions, IGridView, IInput, IMultiValueFilter, ISortBy, UserService, anyFilters, isMultiValueFilter } from 'shop-folder-core';
+import { DBService, FilterFunction, GridService, IContact, IFilterOption, IGridView, IInput, IMultiValueFilter, ISortBy, UserService, anyFilters, isMultiValueFilter } from 'shop-folder-core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Contact } from '../../models';
 import { CommonModule } from '@angular/common';
@@ -43,8 +43,6 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     order: 'asc'
   }
 
-  pageFilters: anyFilters[] = [];
-
   constructor(
     public route: ActivatedRoute,
     private dbService: DBService,
@@ -58,18 +56,19 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     super({
       allViews: ContactPageViews,
       objectCreator: (obj: any) => this.contactObjectCreator(obj),
-      route
+      route,
+      table: dbService.currentDB.contacts
     });
-    this.useTable(this.dbService.currentDB.contacts);
     this.setPageSize(50000);
     this.setSortBy(this.defaultSort);
   }
 
   ngOnInit(): void {
     this.grid.suppressHorizontalScroll = true;
-    this.handleSelectModeChange(false);
     this.createPageFilters();
-    this.refreshData();
+    this.mapParamsToFilter();
+    if (this.data.length === 0) this.mapParamsToFilter();
+    this.handleSelectModeChange(false);
   }
 
   contactObjectCreator(obj: any) {
@@ -85,7 +84,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
         description: 'Filter your data by tags',
         filterType: 'multiValue',
         name: 'Categories',
-        options: [] as IFilterOptions[],
+        options: [] as IFilterOption[],
         type: 'chip',
         selectedOptions: [],
         createMultiFilter: (selectedOptions) => {
@@ -98,14 +97,14 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
           }
         },
         getOptions: async () => {
-          const data: IFilterOptions[] = (
+          const data: IFilterOption[] = (
             await this.dbService.currentDB.contactTypes.orderBy('name').toArray()
           )
             .map(contactType => {
               return {
                 label: contactType.name,
                 value: contactType.id
-              } as IFilterOptions
+              } as IFilterOption
             });
           return data;
         },
@@ -192,6 +191,8 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
       .subscribe({
         next: res => {
           this.toastr.success('Sync completed');
+          this.createPageFilters();
+          this.updateFilters([]);
           this.refreshData();
           this.handleSelectModeChange(false);
         },
@@ -220,14 +221,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
   }
 
   handleFilterOptions(updatedFilters: anyFilters[]) {
-    let filterfunctions: FilterFunction<IContact>[] = [];
-    updatedFilters.forEach(filter => {
-      if (filter && isMultiValueFilter(filter) && filter.createMultiFilter) {
-        const fn = filter.createMultiFilter(filter.selectedOptions);
-        if (fn) filterfunctions.push(fn);
-      }
-    });
-    super.handleFilterUpdate(filterfunctions);
+    super.handleFilterUpdate(this.convertFiltersToFunctions(updatedFilters));
     this.pageFilters = updatedFilters;
   }
 

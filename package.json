@@ -35,7 +35,7 @@
     "ngx-toastr": "^18.0.0",
     "rxjs": "~7.8.0",
     "shop-folder-component": "^0.0.322",
-    "shop-folder-core": "^0.0.135",
+    "shop-folder-core": "^0.0.157",
     "shop-folder-logger": "^0.0.2",
     "shop-folder-logo": "^0.0.53",
     "tslib": "^2.3.0",

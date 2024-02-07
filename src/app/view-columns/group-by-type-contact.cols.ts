@@ -7,7 +7,7 @@ export const GROUP_BY_TYPE_COLUMNS: IGridView = {
         {
             field: 'types',
             rowGroup: true,
-            valueGetter: (params) => params.data.types ? params.data.types.join('') : '',
+            valueGetter: (params) => params.data.types ? params.data.types.join(',') : '',
             hide: true,
         },
         {
