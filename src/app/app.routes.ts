@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { ContactComponent } from './components/contact/contact.component';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { AddEditContactGroupComponent } from './components/add-edit-contact-group/add-edit-contact-group.component';
+import { ContactGroupComponent } from './components/contact-group/contact-group.component';
 
 
 export const childRoutes: Routes = [
@@ -13,6 +14,10 @@ export const childRoutes: Routes = [
     {
         path: 'home',
         component: ContactComponent
+    },
+    {
+        path: 'groups',
+        component: ContactGroupComponent
     },
     {
         path: 'addEditGroup',

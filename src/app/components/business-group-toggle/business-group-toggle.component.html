@@ -1,0 +1,5 @@
+@if (contactGroup) {
+    <mat-icon class="business-chip" [ngClass]="{
+        'disabled': !contactGroup.isBusinessAccount
+    }">business_chip</mat-icon>
+}

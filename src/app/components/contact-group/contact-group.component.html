@@ -1,34 +1,18 @@
-<lib-dynamic-layout title="Contact" backURL="/home" [hideDrawer]="true" [hideFilter]="false" [selectMode]="selectMode"
-    [filters]="pageFilters" (selectModeChange)="handleSelectModeChange($event)"
-    (onFilterUpdate)="handleFilterOptions($event)">
+<lib-dynamic-layout title="Group" backURL="/contact" [hideDrawer]="true" [hideFilter]="false" [selectMode]="selectMode"
+    [filters]="pageFilters" (selectModeChange)="handleSelectModeChange($event)" (onFilterUpdate)="handleFilterOptions($event)">
     <ng-container selectaction>
-        @if (gridApi && gridApi.getSelectedRows().length > 0){
-        <mat-icon (click)="handleContactTagClick()">new_label</mat-icon>
-        <mat-icon (click)="handleGroupClick()"><lib-group-logo></lib-group-logo></mat-icon>
-        <mat-icon (click)="handleDeleteClick()">delete</mat-icon>
-        }
+        <!-- @if (gridApi && gridApi.getSelectedRows().length > 0){
+            <mat-icon (click)="handleContactTagClick()">new_label</mat-icon>
+            <mat-icon (click)="handleGroupClick()"><lib-group-logo></lib-group-logo></mat-icon>
+            <mat-icon (click)="handleDeleteClick()">delete</mat-icon>
+        } -->
     </ng-container>
 
     <ng-container gridaction>
-        <mat-icon>add</mat-icon>
+        <!-- <mat-icon>add</mat-icon>
         <mat-icon [routerLink]="['/contact/addEditGroup']" [queryParams]="{creationType:'tag'}">new_label</mat-icon>
-        <mat-icon [matMenuTriggerFor]="groupMenu" (menuOpened)="isGroupMenuOpened=true"
-            (menuClosed)="isGroupMenuOpened=false" [ngClass]="{
-            'opened': isGroupMenuOpened
-        }">
-            <lib-group-logo></lib-group-logo>
-        </mat-icon>
-        <mat-menu #groupMenu="matMenu">
-            <button mat-menu-item [routerLink]="['/contact/addEditGroup']">
-                <mat-icon>add</mat-icon>
-                <span>Add Group</span>
-            </button>
-            <button mat-menu-item [routerLink]="['/contact/groups']">
-                <mat-icon>visibility</mat-icon>
-                <span>View Group</span>
-            </button>
-        </mat-menu>
-        <mat-icon (click)="triggerSync()">sync</mat-icon>
+        <mat-icon [routerLink]="['/contact/addEditGroup']"><lib-group-logo></lib-group-logo></mat-icon>
+        <mat-icon (click)="triggerSync()">sync</mat-icon> -->
     </ng-container>
 
     <ng-container pagebody>
@@ -47,7 +31,7 @@
     <ng-container pagefooter>
 
         <!-- View -->
-        <div class="views-menu">
+        <!-- <div class="views-menu">
             <mat-icon [matMenuTriggerFor]="viewMenu">more_vert</mat-icon>
             <mat-menu #viewMenu="matMenu">
                 @for (view of gridViews; track view.viewName) {
@@ -70,6 +54,6 @@
         }
         @else {
         <mat-icon (click)="expandAll()">toggle_on</mat-icon>
-        }
+        } -->
     </ng-container>
 </lib-dynamic-layout>

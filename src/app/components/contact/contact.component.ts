@@ -38,6 +38,8 @@ const ContactPageViews: IGridView[] = [
 })
 export class ContactComponent extends GridService<IContact> implements OnInit {
 
+  isGroupMenuOpened = false;
+  isViewMenuOpened = false;
   private defaultSort: ISortBy = {
     column: 'name',
     order: 'asc'
@@ -63,11 +65,11 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
     this.setSortBy(this.defaultSort);
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.grid.suppressHorizontalScroll = true;
     this.createPageFilters();
     this.mapParamsToFilter();
-    if (this.data.length === 0) this.mapParamsToFilter();
     this.handleSelectModeChange(false);
   }
 
@@ -85,7 +87,7 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
         filterType: 'multiValue',
         name: 'Categories',
         options: [] as IFilterOption[],
-        type: 'chip',
+        type: 'checkbox',
         selectedOptions: [],
         createMultiFilter: (selectedOptions) => {
           return selectedOptions.length === 0 ? undefined : (collection: Collection<IContact, number>) => {

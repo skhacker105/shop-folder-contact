@@ -77,7 +77,8 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
     return '';
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.refreshData();
     this.subscribeToSearchChange();
     this.subscribeToParams();
