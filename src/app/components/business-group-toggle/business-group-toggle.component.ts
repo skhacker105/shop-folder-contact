@@ -18,10 +18,8 @@ export class BusinessGroupToggleComponent implements ICellRendererAngularComp {
 
   agInit(params: ICellRendererParams<any, any, any>): void {
     this.contactGroup = params.data;
-    console.log({params, data: this.contactGroup});
   }
   refresh(params: ICellRendererParams<any, any, any>): boolean {
-    console.log({params1: params});
     return true;
   }
 
