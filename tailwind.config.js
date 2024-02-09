@@ -52,6 +52,9 @@ module.exports = {
         "page-header": '33px'
       },
       borderColor: {
+        "default": {
+          "data": "#dfdfdf"
+        },
         "dashboard": {
           "title": "white"
         }

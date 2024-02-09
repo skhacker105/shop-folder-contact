@@ -19,14 +19,16 @@
             <lib-group-logo></lib-group-logo>
         </mat-icon>
         <mat-menu #groupMenu="matMenu">
-            <button mat-menu-item [routerLink]="['/contact/addEditGroup']">
-                <mat-icon>add</mat-icon>
-                <span>Add Group</span>
-            </button>
-            <button mat-menu-item [routerLink]="['/contact/groups']">
-                <mat-icon>visibility</mat-icon>
-                <span>View Group</span>
-            </button>
+            <div class="menu-container">
+                <div class="menu-item text-default" [routerLink]="['/contact/addEditGroup']">
+                    <mat-icon>add</mat-icon>
+                    <span>Add Group</span>
+                </div>
+                <div class="menu-item text-default" [routerLink]="['/contact/groups']">
+                    <mat-icon>visibility</mat-icon>
+                    <span>View Group</span>
+                </div>
+            </div>
         </mat-menu>
         <mat-icon (click)="triggerSync()">sync</mat-icon>
     </ng-container>
@@ -47,19 +49,28 @@
     <ng-container pagefooter>
 
         <!-- View -->
-        <div class="views-menu">
-            <mat-icon [matMenuTriggerFor]="viewMenu">more_vert</mat-icon>
+        <div class="views-menu" [ngClass]="{
+            'opened': isViewMenuOpened
+        }">
+            <mat-icon [matMenuTriggerFor]="viewMenu" (menuOpened)="isViewMenuOpened=true"
+                (menuClosed)="isViewMenuOpened=false">more_vert</mat-icon>
             <mat-menu #viewMenu="matMenu">
                 @for (view of gridViews; track view.viewName) {
-                <button mat-menu-item (click)="updateSelectedView(view)" [ngClass]="{
-                            'bg-selected-row text-selected-row': selectedView?.viewName === view.viewName
-                        }">
-                    <span>{{ view.viewName }}</span>
-                </button>
+                <!-- menu-container -->
+                <div class="menu-container text-default" (click)="updateSelectedView(view)" [ngClass]="{
+                        'bg-selected-row text-selected-row': selectedView?.viewName === view.viewName
+                    }">
+                    <div class="menu-item">
+                        {{ view.viewName }}
+                    </div>
+                </div>
                 }
             </mat-menu>
         </div>
-        <div class="view-current" [matMenuTriggerFor]="viewMenu">
+        <div class="view-current" [matMenuTriggerFor]="viewMenu" (menuOpened)="isViewMenuOpened=true"
+            (menuClosed)="isViewMenuOpened=false" [ngClass]="{
+            'opened': isViewMenuOpened
+        }">
             {{ selectedView?.viewName }}
         </div>
 

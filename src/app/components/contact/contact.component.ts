@@ -20,6 +20,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Collection } from 'dexie';
 import { GroupLogoComponent } from 'shop-folder-logo';
+import { CellClassParams, ColTypeDef, EditableCallbackParams } from 'ag-grid-enterprise';
 
 const ContactPageViews: IGridView[] = [
   DEFAULT_COLUMNS,
@@ -40,6 +41,16 @@ export class ContactComponent extends GridService<IContact> implements OnInit {
 
   isGroupMenuOpened = false;
   isViewMenuOpened = false;
+  // columnTypes: {
+  //   [key: string]: ColTypeDef;
+  // } = {
+  //   editableColumn: {
+  //     editable: (params: EditableCallbackParams<any>) => true,
+  //     cellStyle: (params: CellClassParams<any>) => {
+  //       return { backgroundColor: '#2244CC44' };
+  //     },
+  //   }
+  // };
   private defaultSort: ISortBy = {
     column: 'name',
     order: 'asc'

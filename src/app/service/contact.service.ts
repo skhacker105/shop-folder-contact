@@ -53,7 +53,9 @@ export class ContactService {
     const toAdd = this.filterContactsToAdd(phoneContacts, existingData);
     const toUpdate = this.filterContactsToUpdate(phoneContacts, existingData);
     const obs = [this.contactTable.bulkAdd(toAdd), this.contactTable.bulkPut(toUpdate)];
+    console.log({toAdd, toUpdate});
     return forkJoin(obs)
+    // return of([]);
   }
 
   filterContactsToAdd(phoneContacts: GetContactsResult, existingData: IContact[]): IContact[] {

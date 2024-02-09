@@ -17,7 +17,8 @@ export const GROUP_BY_LETTER_COLUMNS: IGridView = {
             flex: 7,
             hide: false,
             rowGroup: false,
-            resizable: false
+            editable: true,
+            cellEditor: 'agTextCellEditor'
         },
         {
             headerName: 'Phone',
@@ -25,7 +26,8 @@ export const GROUP_BY_LETTER_COLUMNS: IGridView = {
             flex: 5,
             hide: false,
             rowGroup: false,
-            resizable: false
+            resizable: false,
+            editable: true,
         },
         {
             field: 'types',
