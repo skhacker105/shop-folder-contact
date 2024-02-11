@@ -20,7 +20,6 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { Collection } from 'dexie';
 import { GroupLogoComponent } from 'shop-folder-logo';
-import { CellClassParams, ColTypeDef, EditableCallbackParams } from 'ag-grid-enterprise';
 
 const ContactPageViews: IGridView[] = [
   DEFAULT_COLUMNS,

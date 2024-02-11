@@ -100,7 +100,6 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
     this.route.queryParams
       .pipe(take(1))
       .subscribe((params: any) => {
-        console.log(params)
         this.selectedIds = params.selectedIds ? params.selectedIds.split(',').map((id: string) => +id) : [];
         this.creationType = params.creationType ? params.creationType : this.creationType;
         this.loadSelectedIdsAndProceed();
@@ -186,8 +185,7 @@ export class AddEditContactGroupComponent extends GridService<IContact> implemen
           // this.router.navigate([])
         },
         error: err => {
-          this.logger.logError('Error while adding new group.');
-          console.log(err);
+          this.logger.logError(err);
         }
       });
   }

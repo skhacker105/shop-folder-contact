@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ContactPayload, GetContactsResult, PhonePayload } from '@capacitor-community/contacts';
 import { Observable, forkJoin, from, mergeMap, of, take } from 'rxjs';
-import { DBService, IConfirmation, IContact, IContactGroup, IContactType, IInput, IUser, UserService } from 'shop-folder-core';
+import { CapacitorManagerService, DBService, IConfirmation, IContact, IContactGroup, IContactType, IInput, IUser, UserService } from 'shop-folder-core';
 import { Contact } from '../models';
 import { Table } from 'dexie';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,41 +21,27 @@ export class ContactService {
     private http: HttpClient,
     private userService: UserService,
     private dbService: DBService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private capacitor: CapacitorManagerService
   ) {
     this.contactTable = dbService.currentDB.contacts;
     this.contactTypeTable = dbService.currentDB.contactTypes;
   }
 
-  getPhoneContacts(): Observable<GetContactsResult> {
-    // if (!environment.local)
-    // return from(Contacts.getContacts({
-    //   projection: {
-    //     name: true,
-    //     emails: true,
-    //     organization: true,
-    //     phones: true,
-    //     postalAddresses: true
-    //   }
-    // }))
-    // else
+  getStaticPhoneContacts(): Observable<GetContactsResult> {
     return this.http.get<GetContactsResult>('assets/sampleData/phone-contacts.json')
   }
 
   triggerSync(existingData: IContact[]): Observable<number[]> {
-    return this.getPhoneContacts()
-      .pipe(
-        mergeMap(phoneContacts => this.processPhoneContacts(phoneContacts, existingData))
-      )
+    const obs = this.capacitor.isNativeApp() ? from(this.capacitor.getPhoneContacts()) : this.getStaticPhoneContacts();
+    return obs.pipe(mergeMap(phoneContacts => this.processPhoneContacts(phoneContacts, existingData)));
   }
 
   processPhoneContacts(phoneContacts: GetContactsResult, existingData: IContact[]): Observable<number[]> {
     const toAdd = this.filterContactsToAdd(phoneContacts, existingData);
     const toUpdate = this.filterContactsToUpdate(phoneContacts, existingData);
     const obs = [this.contactTable.bulkAdd(toAdd), this.contactTable.bulkPut(toUpdate)];
-    console.log({toAdd, toUpdate});
-    return forkJoin(obs)
-    // return of([]);
+    return forkJoin(obs);
   }
 
   filterContactsToAdd(phoneContacts: GetContactsResult, existingData: IContact[]): IContact[] {
