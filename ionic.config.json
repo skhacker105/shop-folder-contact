@@ -1,0 +1,15 @@
+{
+  "name": "shop-folder-contact",
+  "integrations": {
+    "enterprise": {
+      "keyId": 17503,
+      "productKey": "key_5e99ad162e8e4201988eada7df98fde0",
+      "appId": "133a341c",
+      "orgId": "4093d570-832c-4fc6-851a-427ca3daf698",
+      "registries": [
+        "@ionic-enterprise;https://registry.ionicframework.com/"
+      ]
+    }
+  },
+  "type": "angular-standalone"
+}
